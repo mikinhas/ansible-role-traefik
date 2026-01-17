@@ -1,0 +1,52 @@
+---
+- name: Create traefik config directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ traefik_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create traefik acme directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ traefik_config_dir }}/acme"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Configure traefik static config
+  become: true
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ traefik_config_dir }}/traefik.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Configure traefik dynamic config
+  become: true
+  ansible.builtin.template:
+    src: dynamic.yml.j2
+    dest: "{{ traefik_config_dir }}/dynamic.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Run traefik container
+  community.docker.docker_container:
+    name: "{{ traefik_container_name }}"
+    image: "traefik:{{ traefik_version }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "{{ traefik_config_dir }}/dynamic.yml:/etc/traefik/dynamic.yml:ro"
+      - "{{ traefik_config_dir }}/acme:/etc/traefik/acme"

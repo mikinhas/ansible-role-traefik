@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  role_name: traefik
+  namespace: mikinhas
+  author: Michael MACHADO
+  description: Traefik reverse proxy role
+  license: "MIT"
+  min_ansible_version: "2.16"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+
+dependencies:
+  - role: mikinhas.docker

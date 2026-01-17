@@ -1,0 +1,26 @@
+---
+traefik_version: "v3.2"
+traefik_container_name: traefik
+traefik_config_dir: /etc/traefik
+traefik_acme_email: ""
+traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+
+traefik_http_routers: []
+# Example:
+# traefik_http_routers:
+#   - name: myapp
+#     rule: "Host(`myapp.example.com`)"
+#     service: myapp
+#     tls: true
+#   - name: api
+#     rule: "Host(`api.example.com`) && PathPrefix(`/v1`)"
+#     service: api
+#     tls: true
+
+traefik_services: []
+# Example:
+# traefik_services:
+#   - name: myapp
+#     url: "http://192.168.1.10:8080"
+#   - name: api
+#     url: "http://192.168.1.11:3000"
