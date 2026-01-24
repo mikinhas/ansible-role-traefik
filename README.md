@@ -31,12 +31,14 @@ An Ansible role to deploy [Traefik](https://traefik.io/) reverse proxy as a Dock
 | `traefik_container_name` | `traefik` | Name of the Docker container |
 | `traefik_config_dir` | `/etc/traefik` | Configuration directory on the host |
 
-### ACME / Let's Encrypt
+### ACME / Let's Encrypt (optional)
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `traefik_acme_email` | `""` | Email for Let's Encrypt registration (required for HTTPS) |
-| `traefik_acme_server` | `https://acme-v02.api.letsencrypt.org/directory` | ACME server URL |
+| Variable               | Default                                          | Description                                                      |
+|------------------------|--------------------------------------------------|------------------------------------------------------------------|
+| `traefik_acme_email`   | `""`                                             | Email for Let's Encrypt registration. If empty, ACME is disabled |
+| `traefik_acme_server`  | `https://acme-v02.api.letsencrypt.org/directory` | ACME server URL                                                  |
+
+> **Note**: When `traefik_acme_email` is not set, the ACME directory and certificate resolver are not created. Traefik will run without automatic certificate management.
 
 ### HTTP Routers
 

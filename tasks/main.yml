@@ -16,6 +16,7 @@
     owner: root
     group: root
     mode: "0700"
+  when: traefik_acme_email
 
 - name: Configure traefik static config
   become: true
@@ -46,7 +47,12 @@
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - "{{ traefik_config_dir }}/traefik.yml:/etc/traefik/traefik.yml:ro"
-      - "{{ traefik_config_dir }}/dynamic.yml:/etc/traefik/dynamic.yml:ro"
-      - "{{ traefik_config_dir }}/acme:/etc/traefik/acme"
+    volumes: >-
+      {{
+        [
+          traefik_config_dir ~ '/traefik.yml:/etc/traefik/traefik.yml:ro',
+          traefik_config_dir ~ '/dynamic.yml:/etc/traefik/dynamic.yml:ro',
+        ] + (
+          [traefik_config_dir ~ '/acme:/etc/traefik/acme'] if traefik_acme_email else []
+        )
+      }}
