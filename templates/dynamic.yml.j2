@@ -2,6 +2,14 @@ http:
 {% if traefik_http_routers %}
   routers:
 {% for router in traefik_http_routers %}
+{% if router.tls | default(false) %}
+    {{ router.name }}-http:
+      rule: "{{ router.rule }}"
+      service: {{ router.service }}
+      entryPoints:
+        - web
+      middlewares:
+        - https-redirect
     {{ router.name }}:
       rule: "{{ router.rule }}"
       service: {{ router.service }}
@@ -9,9 +17,16 @@ http:
         - websecure
       middlewares:
         - security-headers
-{% if router.tls | default(false) and traefik_acme_email %}
+{% if traefik_acme_email %}
       tls:
         certResolver: letsencrypt
+{% endif %}
+{% else %}
+    {{ router.name }}:
+      rule: "{{ router.rule }}"
+      service: {{ router.service }}
+      entryPoints:
+        - web
 {% endif %}
 {% endfor %}
 {% endif %}
@@ -29,6 +44,10 @@ http:
 {% endif %}
 
   middlewares:
+    https-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
     security-headers:
       headers:
         stsSeconds: 31536000

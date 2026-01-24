@@ -52,15 +52,23 @@ Define your HTTP routers using `traefik_http_routers`:
 
 ```yaml
 traefik_http_routers:
+  # HTTPS with automatic HTTP to HTTPS redirect
   - name: myapp
     rule: "Host(`myapp.example.com`)"
     service: myapp
     tls: true
-  - name: api
-    rule: "Host(`api.example.com`) && PathPrefix(`/v1`)"
-    service: api
-    tls: true
+
+  # HTTP only (no redirect, no TLS)
+  - name: internal-api
+    rule: "Host(`api.internal.local`)"
+    service: internal-api
+    tls: false
 ```
+
+| Option | Description |
+|--------|-------------|
+| `tls: true` | HTTPS on port 443 + automatic HTTP→HTTPS redirect on port 80 |
+| `tls: false` | HTTP only on port 80 (no redirect, no TLS) |
 
 ### Services
 
@@ -145,7 +153,7 @@ This role configures Traefik with security best practices:
 
 | Port | Description |
 |------|-------------|
-| 80 | HTTP (redirects to HTTPS) |
+| 80 | HTTP (redirects to HTTPS when `tls: true`, or serves directly when `tls: false`) |
 | 443 | HTTPS |
 | Custom | TCP entrypoints (defined via `traefik_tcp_entrypoints`) |
 
