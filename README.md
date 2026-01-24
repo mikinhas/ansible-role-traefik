@@ -14,8 +14,14 @@ An Ansible role to deploy [Traefik](https://traefik.io/) reverse proxy as a Dock
 ## Requirements
 
 - Ansible >= 2.16
-- Docker installed on the target host
 - `community.docker` collection
+- `community.general` collection
+
+Install dependencies:
+
+```bash
+ansible-galaxy install -r requirements.yml
+```
 
 ## Dependencies
 
@@ -103,6 +109,17 @@ This role configures Traefik with security best practices:
 |------|-------------|
 | 80 | HTTP (redirects to HTTPS) |
 | 443 | HTTPS |
+
+## Testing
+
+This role uses [Molecule](https://molecule.readthedocs.io/) with Vagrant and VirtualBox for testing.
+
+```bash
+pip install -r requirements.txt
+molecule test
+```
+
+The default scenario tests the role on Ubuntu Noble (24.04) without ACME enabled.
 
 ## License
 

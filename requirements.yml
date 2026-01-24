@@ -1,0 +1,8 @@
+---
+roles:
+  - name: mikinhas.docker
+
+collections:
+  - name: community.general
+    version: ">=9.0.0"
+  - name: community.docker

@@ -1,0 +1,16 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  gather_facts: true
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+      vars:
+        traefik_http_routers:
+          - name: test-app
+            rule: "Host(`test.example.com`)"
+            service: test-app
+            tls: true
+        traefik_services:
+          - name: test-app
+            url: "http://127.0.0.1:8080"
