@@ -22,7 +22,9 @@ http:
     {{ service.name }}:
       loadBalancer:
         servers:
-          - url: "{{ service.url }}"
+{% for url in service.urls %}
+          - url: "{{ url }}"
+{% endfor %}
 {% endfor %}
 {% endif %}
 

@@ -13,4 +13,5 @@
             tls: true
         traefik_services:
           - name: test-app
-            url: "http://127.0.0.1:8080"
+            urls:
+              - "http://127.0.0.1:8080"

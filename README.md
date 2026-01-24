@@ -69,9 +69,12 @@ Define backend services using `traefik_services`:
 ```yaml
 traefik_services:
   - name: myapp
-    url: "http://192.168.1.10:8080"
+    urls:
+      - "http://192.168.1.10:8080"
   - name: api
-    url: "http://192.168.1.11:3000"
+    urls:
+      - "http://192.168.1.11:3000"
+      - "http://192.168.1.12:3000"
 ```
 
 ## Example Playbook
@@ -89,7 +92,8 @@ traefik_services:
             tls: true
         traefik_services:
           - name: webapp
-            url: "http://10.0.0.5:8080"
+            urls:
+              - "http://10.0.0.5:8080"
 ```
 
 ## Security Features
