@@ -40,6 +40,31 @@ http:
         frameDeny: true
         referrerPolicy: "strict-origin-when-cross-origin"
 
+{% if traefik_tcp_routers or traefik_tcp_services %}
+tcp:
+{% if traefik_tcp_routers %}
+  routers:
+{% for router in traefik_tcp_routers %}
+    {{ router.name }}:
+      entryPoints:
+        - {{ router.entrypoint }}
+      rule: "{{ router.rule }}"
+      service: {{ router.service }}
+{% endfor %}
+{% endif %}
+{% if traefik_tcp_services %}
+  services:
+{% for service in traefik_tcp_services %}
+    {{ service.name }}:
+      loadBalancer:
+        servers:
+{% for url in service.urls %}
+          - address: "{{ url }}"
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% endif %}
+
 tls:
   options:
     default:

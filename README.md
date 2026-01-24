@@ -7,7 +7,7 @@ An Ansible role to deploy [Traefik](https://traefik.io/) reverse proxy as a Dock
 - Traefik v3.2 deployed as a Docker container
 - Automatic HTTP to HTTPS redirection
 - Let's Encrypt certificate management (ACME)
-- Dynamic configuration for HTTP routers and services
+- Dynamic configuration for HTTP and TCP routers and services
 - Security headers middleware (HSTS, XSS protection, etc.)
 - TLS 1.2+ with strong cipher suites
 
@@ -77,6 +77,40 @@ traefik_services:
       - "http://192.168.1.12:3000"
 ```
 
+### TCP Entrypoints
+
+Define custom TCP entrypoints using `traefik_tcp_entrypoints`:
+
+```yaml
+traefik_tcp_entrypoints:
+  - name: mydb
+    port: 5432
+```
+
+### TCP Routers
+
+Define TCP routers using `traefik_tcp_routers`:
+
+```yaml
+traefik_tcp_routers:
+  - name: mydb
+    entrypoint: mydb
+    rule: "HostSNI(`*`)"
+    service: mydb
+```
+
+### TCP Services
+
+Define TCP backend services using `traefik_tcp_services`:
+
+```yaml
+traefik_tcp_services:
+  - name: mydb
+    urls:
+      - "192.168.1.10:5432"
+      - "192.168.1.11:5432"
+```
+
 ## Example Playbook
 
 ```yaml
@@ -113,6 +147,7 @@ This role configures Traefik with security best practices:
 |------|-------------|
 | 80 | HTTP (redirects to HTTPS) |
 | 443 | HTTPS |
+| Custom | TCP entrypoints (defined via `traefik_tcp_entrypoints`) |
 
 ## Testing
 

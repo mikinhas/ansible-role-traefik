@@ -27,3 +27,25 @@ traefik_services: []
 #     urls:
 #       - "http://192.168.1.11:3000"
 #       - "http://192.168.1.12:3000"
+
+traefik_tcp_entrypoints: []
+# Example:
+# traefik_tcp_entrypoints:
+#   - name: mydb
+#     port: 5432
+
+traefik_tcp_routers: []
+# Example:
+# traefik_tcp_routers:
+#   - name: mydb
+#     entrypoint: mydb
+#     rule: "HostSNI(`*`)"
+#     service: mydb
+
+traefik_tcp_services: []
+# Example:
+# traefik_tcp_services:
+#   - name: mydb
+#     urls:
+#       - "192.168.1.10:5432"
+#       - "192.168.1.11:5432"

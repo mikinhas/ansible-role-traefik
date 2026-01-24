@@ -8,6 +8,10 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+{% for tcp_entry_point in traefik_tcp_entrypoints %}
+  {{ tcp_entry_point.name }}:
+    address: ":{{ tcp_entry_point.port }}"
+{% endfor %}
 
 providers:
   file:

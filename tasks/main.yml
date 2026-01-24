@@ -44,9 +44,11 @@
     image: "traefik:{{ traefik_version }}"
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    ports: >-
+      {{
+        ['80:80', '443:443'] +
+        traefik_tcp_entrypoints | map(attribute='port') | map('regex_replace', '(.+)', '\\1:\\1') | list
+      }}
     volumes: >-
       {{
         [
