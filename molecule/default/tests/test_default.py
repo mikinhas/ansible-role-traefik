@@ -67,3 +67,23 @@ def test_port_80(host):
 def test_port_443(host):
     """Verify port 443 is listening."""
     assert host.socket("tcp://0.0.0.0:443").is_listening
+
+
+def test_custom_entrypoint(host):
+    """Verify custom entrypoint is configured."""
+    f = host.file("/etc/traefik/traefik.yml")
+    assert f.contains("custom:")
+    assert f.contains(":8096")
+
+
+def test_custom_port_router(host):
+    """Verify router uses custom entrypoint."""
+    f = host.file("/etc/traefik/dynamic.yml")
+    content = f.content_string
+    assert "test-custom-port:" in content
+    assert "custom" in content
+
+
+def test_port_8096(host):
+    """Verify custom port 8096 is listening."""
+    assert host.socket("tcp://0.0.0.0:8096").is_listening

@@ -34,9 +34,11 @@ traefik_services: []
 #       - "http://192.168.1.11:3000"
 #       - "http://192.168.1.12:3000"
 
-traefik_tcp_entrypoints: []
+traefik_entrypoints: []
 # Example:
-# traefik_tcp_entrypoints:
+# traefik_entrypoints:
+#   - name: custom
+#     port: 8080
 #   - name: mydb
 #     port: 5432
 

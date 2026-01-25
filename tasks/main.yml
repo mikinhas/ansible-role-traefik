@@ -70,17 +70,18 @@
     mode: "0644"
   notify: Restart traefik
 
+- name: Build custom entrypoint ports
+  ansible.builtin.set_fact:
+    _traefik_custom_ports: "{{ (_traefik_custom_ports | default([])) + [item | string ~ ':' ~ item | string] }}"
+  loop: "{{ traefik_entrypoints | map(attribute='port') | list }}"
+
 - name: Run traefik container
   community.docker.docker_container:
     name: "{{ traefik_container_name }}"
     image: "traefik:{{ traefik_version }}"
     state: started
     restart_policy: unless-stopped
-    ports: >-
-      {{
-        ['80:80', '443:443'] +
-        traefik_tcp_entrypoints | map(attribute='port') | map('regex_replace', '(.+)', '\\1:\\1') | list
-      }}
+    ports: "{{ ['80:80', '443:443'] + (_traefik_custom_ports | default([])) }}"
     volumes: >-
       {{
         [

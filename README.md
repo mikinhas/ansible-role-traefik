@@ -101,14 +101,27 @@ traefik_services:
       - "http://192.168.1.12:3000"
 ```
 
-### TCP Entrypoints
+### Custom Entrypoints
 
-Define custom TCP entrypoints using `traefik_tcp_entrypoints`:
+Define custom entrypoints for services that need dedicated ports:
 
 ```yaml
-traefik_tcp_entrypoints:
+traefik_entrypoints:
+  - name: custom
+    port: 8080
   - name: mydb
     port: 5432
+```
+
+Then reference the entrypoint in your router:
+
+```yaml
+traefik_http_routers:
+  - name: myapp
+    rule: "PathPrefix(`/`)"
+    service: myapp
+    tls: false
+    entrypoint: custom
 ```
 
 ### TCP Routers
@@ -171,7 +184,7 @@ This role configures Traefik with security best practices:
 |------|-------------|
 | 80 | HTTP (redirects to HTTPS when `tls: true`, or serves directly when `tls: false`) |
 | 443 | HTTPS |
-| Custom | TCP entrypoints (defined via `traefik_tcp_entrypoints`) |
+| Custom | Custom entrypoints (defined via `traefik_entrypoints`) |
 
 ## Testing
 

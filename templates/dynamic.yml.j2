@@ -28,7 +28,7 @@ http:
       rule: "{{ router.rule }}"
       service: {{ router.service }}
       entryPoints:
-        - web
+        - {{ router.entrypoint | default('web') }}
 {% endif %}
 {% endfor %}
 {% endif %}
