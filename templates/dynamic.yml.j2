@@ -20,6 +20,8 @@ http:
 {% if traefik_acme_email %}
       tls:
         certResolver: letsencrypt
+{% elif traefik_tls_cert and traefik_tls_key %}
+      tls: {}
 {% endif %}
 {% else %}
     {{ router.name }}:
@@ -85,6 +87,11 @@ tcp:
 {% endif %}
 
 tls:
+{% if traefik_tls_cert and traefik_tls_key %}
+  certificates:
+    - certFile: /etc/traefik/certs/cert.pem
+      keyFile: /etc/traefik/certs/key.pem
+{% endif %}
   options:
     default:
       minVersion: VersionTLS12

@@ -46,6 +46,22 @@ ansible-galaxy install -r requirements.yml
 
 > **Note**: When `traefik_acme_email` is not set, the ACME directory and certificate resolver are not created. Traefik will run without automatic certificate management.
 
+### Custom TLS Certificates (optional)
+
+Use your own certificates instead of ACME:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `traefik_tls_cert` | `""` | Path to the certificate file (PEM format) |
+| `traefik_tls_key` | `""` | Path to the private key file (PEM format) |
+
+```yaml
+traefik_tls_cert: "/path/to/wildcard.pem"
+traefik_tls_key: "/path/to/wildcard-key.pem"
+```
+
+> **Note**: Custom certificates take precedence over ACME. When both `traefik_tls_cert` and `traefik_tls_key` are set, the certificate files are copied to the target host and used for all `tls: true` routers.
+
 ### HTTP Routers
 
 Define your HTTP routers using `traefik_http_routers`:

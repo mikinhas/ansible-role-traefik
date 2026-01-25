@@ -5,6 +5,12 @@ traefik_config_dir: /etc/traefik
 traefik_acme_email: ""
 traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
 
+traefik_tls_cert: ""
+traefik_tls_key: ""
+# Example:
+# traefik_tls_cert: "/path/to/wildcard.pem"
+# traefik_tls_key: "/path/to/wildcard-key.pem"
+
 traefik_http_routers: []
 # Example:
 # traefik_http_routers:
