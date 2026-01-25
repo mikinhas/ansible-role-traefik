@@ -11,7 +11,14 @@
             rule: "Host(`test.example.com`)"
             service: test-app
             tls: true
+          - name: test-http-only
+            rule: "Host(`http.example.com`)"
+            service: test-http-only
+            tls: false
         traefik_services:
           - name: test-app
             urls:
               - "http://127.0.0.1:8080"
+          - name: test-http-only
+            urls:
+              - "http://127.0.0.1:9090"

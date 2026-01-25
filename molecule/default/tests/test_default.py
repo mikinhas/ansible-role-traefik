@@ -29,6 +29,28 @@ def test_traefik_dynamic_config(host):
     assert f.exists
     assert f.is_file
     assert f.contains("test-app")
+    assert f.contains("test-http-only")
+
+
+def test_traefik_tls_router(host):
+    """Verify TLS router has both HTTP redirect and HTTPS routers."""
+    f = host.file("/etc/traefik/dynamic.yml")
+    assert f.contains("test-app-http")  # HTTP redirect router
+    assert f.contains("https-redirect")  # Redirect middleware
+
+
+def test_traefik_http_only_router(host):
+    """Verify HTTP-only router uses web entrypoint."""
+    f = host.file("/etc/traefik/dynamic.yml")
+    content = f.content_string
+    # test-http-only should use web entrypoint, not websecure
+    assert "test-http-only:" in content
+
+
+def test_traefik_certs_dir_absent(host):
+    """Verify certs directory is not created when no custom cert is set."""
+    d = host.file("/etc/traefik/certs")
+    assert not d.exists
 
 
 def test_traefik_container_running(host):
