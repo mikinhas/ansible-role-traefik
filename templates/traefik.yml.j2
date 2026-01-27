@@ -3,9 +3,15 @@ entryPoints:
     address: ":80"
   websecure:
     address: ":443"
-{% for entry_point in traefik_entrypoints %}
-  {{ entry_point.name }}:
-    address: ":{{ entry_point.port }}"
+{% for route in traefik_http | default([]) %}
+{% if route.port is defined %}
+  {{ route.name }}:
+    address: ":{{ route.port }}"
+{% endif %}
+{% endfor %}
+{% for route in traefik_tcp | default([]) %}
+  {{ route.name }}:
+    address: ":{{ route.port }}"
 {% endfor %}
 
 providers:

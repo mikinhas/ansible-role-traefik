@@ -1,48 +1,55 @@
 http:
-{% if traefik_http_routers %}
+{% if traefik_http %}
   routers:
-{% for router in traefik_http_routers %}
-{% if router.tls | default(false) %}
-    {{ router.name }}-http:
-      rule: "{{ router.rule }}"
-      service: {{ router.service }}
-      entryPoints:
-        - web
-      middlewares:
-        - https-redirect
-    {{ router.name }}:
-      rule: "{{ router.rule }}"
-      service: {{ router.service }}
-      entryPoints:
-        - websecure
-      middlewares:
-        - security-headers
+{% for route in traefik_http %}
+{% if route.tls | default(false) %}
+    {{ route.name }}-http:
+      rule: {{ route.rule }}
+      service: {{ route.name }}
+      entryPoints: [web]
+      middlewares: [https-redirect]
+
+    {{ route.name }}:
+      rule: {{ route.rule }}
+      service: {{ route.name }}
+      entryPoints: [websecure]
+      middlewares: [security-headers]
 {% if traefik_acme_email %}
       tls:
         certResolver: letsencrypt
-{% elif traefik_tls_cert and traefik_tls_key %}
+{% else %}
       tls: {}
 {% endif %}
+
 {% else %}
-    {{ router.name }}:
-      rule: "{{ router.rule }}"
-      service: {{ router.service }}
-      entryPoints:
-        - {{ router.entrypoint | default('web') }}
-{% endif %}
-{% endfor %}
+    {{ route.name }}:
+      rule: {{ route.rule }}
+      service: {{ route.name }}
+      entryPoints: [{{ route.name if route.port is defined else 'web' }}]
+{% if route.host_header is defined %}
+      middlewares: [{{ route.name }}-host]
 {% endif %}
 
-{% if traefik_services %}
+{% endif %}
+{% endfor %}
+
   services:
-{% for service in traefik_services %}
-    {{ service.name }}:
+{% for route in traefik_http %}
+    {{ route.name }}:
       loadBalancer:
+{% if route.skip_tls_verify | default(false) %}
+        serversTransport: insecure-skip-verify
+{% endif %}
         servers:
-{% for url in service.urls %}
-          - url: "{{ url }}"
+{% for backend in route.backends %}
+          - url: {{ backend }}
 {% endfor %}
+
 {% endfor %}
+
+  serversTransports:
+    insecure-skip-verify:
+      insecureSkipVerify: true
 {% endif %}
 
   middlewares:
@@ -50,6 +57,7 @@ http:
       redirectScheme:
         scheme: https
         permanent: true
+
     security-headers:
       headers:
         stsSeconds: 31536000
@@ -59,31 +67,43 @@ http:
         contentTypeNosniff: true
         browserXssFilter: true
         frameDeny: true
-        referrerPolicy: "strict-origin-when-cross-origin"
+        referrerPolicy: strict-origin-when-cross-origin
 
-{% if traefik_tcp_routers or traefik_tcp_services %}
-tcp:
-{% if traefik_tcp_routers %}
-  routers:
-{% for router in traefik_tcp_routers %}
-    {{ router.name }}:
-      entryPoints:
-        - {{ router.entrypoint }}
-      rule: "{{ router.rule }}"
-      service: {{ router.service }}
-{% endfor %}
+{% for route in traefik_http | default([]) %}
+{% if route.host_header is defined %}
+    {{ route.name }}-host:
+      headers:
+        customRequestHeaders:
+          Host: {{ route.host_header }}
+
 {% endif %}
-{% if traefik_tcp_services %}
+{% endfor %}
+
+{% if traefik_tcp %}
+tcp:
+  routers:
+{% for route in traefik_tcp %}
+    {{ route.name }}:
+      entryPoints: [{{ route.name }}]
+      rule: {{ route.rule }}
+      service: {{ route.name }}
+{% if route.tls_passthrough | default(false) %}
+      tls:
+        passthrough: true
+{% endif %}
+
+{% endfor %}
+
   services:
-{% for service in traefik_tcp_services %}
-    {{ service.name }}:
+{% for route in traefik_tcp %}
+    {{ route.name }}:
       loadBalancer:
         servers:
-{% for url in service.urls %}
-          - address: "{{ url }}"
+{% for backend in route.backends %}
+          - address: {{ backend }}
 {% endfor %}
+
 {% endfor %}
-{% endif %}
 {% endif %}
 
 tls:
@@ -92,6 +112,7 @@ tls:
     - certFile: /etc/traefik/certs/cert.pem
       keyFile: /etc/traefik/certs/key.pem
 {% endif %}
+
   options:
     default:
       minVersion: VersionTLS12

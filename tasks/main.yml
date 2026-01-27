@@ -72,8 +72,12 @@
 
 - name: Build custom entrypoint ports
   ansible.builtin.set_fact:
-    _traefik_custom_ports: "{{ (_traefik_custom_ports | default([])) + [item | string ~ ':' ~ item | string] }}"
-  loop: "{{ traefik_entrypoints | map(attribute='port') | list }}"
+    _traefik_custom_ports: >-
+      {{
+        ((traefik_http | default([]) | selectattr('port', 'defined') | map(attribute='port') | list) +
+         (traefik_tcp | default([]) | map(attribute='port') | list))
+        | map('string') | map('regex_replace', '^(.*)$', '\1:\1') | list
+      }}
 
 - name: Run traefik container
   community.docker.docker_container:
@@ -81,6 +85,7 @@
     image: "traefik:{{ traefik_version }}"
     state: started
     restart_policy: unless-stopped
+    networks: "{{ traefik_networks | default(omit) }}"
     ports: "{{ ['80:80', '443:443'] + (_traefik_custom_ports | default([])) }}"
     volumes: >-
       {{

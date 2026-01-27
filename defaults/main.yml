@@ -2,6 +2,12 @@
 traefik_version: "v3.2"
 traefik_container_name: traefik
 traefik_config_dir: /etc/traefik
+
+traefik_networks: []
+# Example:
+# traefik_networks:
+#   - name: mynetwork
+
 traefik_acme_email: ""
 traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
 
@@ -11,49 +17,48 @@ traefik_tls_key: ""
 # traefik_tls_cert: "/path/to/wildcard.pem"
 # traefik_tls_key: "/path/to/wildcard-key.pem"
 
-traefik_http_routers: []
+traefik_http: []
 # Example:
-# traefik_http_routers:
+# traefik_http:
+#   # Route HTTPS (ports 80 redirect + 443)
 #   - name: myapp
-#     rule: "Host(`myapp.example.com`)"
-#     service: myapp
+#     rule: Host(`myapp.example.com`)
 #     tls: true
+#     backends:
+#       - http://192.168.1.10:8080
+#
+#   # Route HTTPS avec backend auto-signé
 #   - name: api
-#     rule: "Host(`api.example.com`) && PathPrefix(`/v1`)"
-#     service: api
+#     rule: Host(`api.example.com`)
 #     tls: true
+#     backends:
+#       - https://192.168.1.20:443
+#     skip_tls_verify: true
+#
+#   # Route HTTP sur port custom (crée l'entrypoint automatiquement)
+#   - name: jellyfin
+#     rule: PathPrefix(`/`)
+#     port: 8096
+#     backends:
+#       - https://192.168.1.20:443
+#     skip_tls_verify: true
+#     host_header: jellyfin.example.com
 
-traefik_services: []
+traefik_tcp: []
 # Example:
-# traefik_services:
-#   - name: myapp
-#     urls:
-#       - "http://192.168.1.10:8080"
-#   - name: api
-#     urls:
-#       - "http://192.168.1.11:3000"
-#       - "http://192.168.1.12:3000"
-
-traefik_entrypoints: []
-# Example:
-# traefik_entrypoints:
-#   - name: custom
-#     port: 8080
-#   - name: mydb
+# traefik_tcp:
+#   # Proxy TCP avec TLS passthrough (crée automatiquement l'entrypoint)
+#   - name: k8s-api
+#     port: 6443
+#     rule: HostSNI(`*`)
+#     tls_passthrough: true
+#     backends:
+#       - 192.168.1.100:6443
+#       - 192.168.1.101:6443
+#
+#   # Proxy TCP simple
+#   - name: postgres
 #     port: 5432
-
-traefik_tcp_routers: []
-# Example:
-# traefik_tcp_routers:
-#   - name: mydb
-#     entrypoint: mydb
-#     rule: "HostSNI(`*`)"
-#     service: mydb
-
-traefik_tcp_services: []
-# Example:
-# traefik_tcp_services:
-#   - name: mydb
-#     urls:
-#       - "192.168.1.10:5432"
-#       - "192.168.1.11:5432"
+#     rule: HostSNI(`*`)
+#     backends:
+#       - 192.168.1.50:5432

@@ -43,7 +43,6 @@ def test_traefik_http_only_router(host):
     """Verify HTTP-only router uses web entrypoint."""
     f = host.file("/etc/traefik/dynamic.yml")
     content = f.content_string
-    # test-http-only should use web entrypoint, not websecure
     assert "test-http-only:" in content
 
 
@@ -69,10 +68,10 @@ def test_port_443(host):
     assert host.socket("tcp://0.0.0.0:443").is_listening
 
 
-def test_custom_entrypoint(host):
-    """Verify custom entrypoint is configured."""
+def test_custom_http_entrypoint(host):
+    """Verify custom HTTP entrypoint is configured."""
     f = host.file("/etc/traefik/traefik.yml")
-    assert f.contains("custom:")
+    assert f.contains("test-custom-port:")
     assert f.contains(":8096")
 
 
@@ -81,9 +80,28 @@ def test_custom_port_router(host):
     f = host.file("/etc/traefik/dynamic.yml")
     content = f.content_string
     assert "test-custom-port:" in content
-    assert "custom" in content
 
 
 def test_port_8096(host):
     """Verify custom port 8096 is listening."""
     assert host.socket("tcp://0.0.0.0:8096").is_listening
+
+
+def test_tcp_entrypoint(host):
+    """Verify TCP entrypoint is configured."""
+    f = host.file("/etc/traefik/traefik.yml")
+    assert f.contains("test-tcp:")
+    assert f.contains(":5432")
+
+
+def test_tcp_router(host):
+    """Verify TCP router is configured."""
+    f = host.file("/etc/traefik/dynamic.yml")
+    content = f.content_string
+    assert "tcp:" in content
+    assert "test-tcp:" in content
+
+
+def test_port_5432(host):
+    """Verify TCP port 5432 is listening."""
+    assert host.socket("tcp://0.0.0.0:5432").is_listening
