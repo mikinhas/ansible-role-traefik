@@ -81,6 +81,16 @@ traefik_http:
       - https://192.168.1.20:443
     skip_tls_verify: true
     host_header: jellyfin.example.com
+
+  # HTTPS with IP allowlist
+  - name: prometheus
+    rule: Host(`prometheus.example.com`)
+    tls: true
+    backends:
+      - http://192.168.1.30:9090
+    allowed_ips:
+      - 82.100.0.1/32
+      - 192.168.1.0/24
 ```
 
 ### HTTP Route Options
@@ -94,6 +104,7 @@ traefik_http:
 | `port` | no | Custom port (creates entrypoint automatically) |
 | `skip_tls_verify` | no | Skip TLS verification for HTTPS backends |
 | `host_header` | no | Override Host header sent to backend |
+| `allowed_ips` | no | List of CIDR ranges allowed to access the route |
 
 ## TCP Routes
 

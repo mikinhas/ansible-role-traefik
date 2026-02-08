@@ -87,6 +87,23 @@ def test_port_8096(host):
     assert host.socket("tcp://0.0.0.0:8096").is_listening
 
 
+def test_ipallow_middleware(host):
+    """Verify ipAllowList middleware is generated for routes with allowed_ips."""
+    f = host.file("/etc/traefik/dynamic.yml")
+    content = f.content_string
+    assert "test-ipallow-ipallow:" in content
+    assert "ipAllowList:" in content
+    assert "10.0.0.0/8" in content
+    assert "192.168.1.0/24" in content
+
+
+def test_ipallow_router_middlewares(host):
+    """Verify ipAllowList middleware is attached to the router."""
+    f = host.file("/etc/traefik/dynamic.yml")
+    content = f.content_string
+    assert "security-headers, test-ipallow-ipallow" in content
+
+
 def test_tcp_entrypoint(host):
     """Verify TCP entrypoint is configured."""
     f = host.file("/etc/traefik/traefik.yml")

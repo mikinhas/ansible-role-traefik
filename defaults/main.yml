@@ -35,6 +35,16 @@ traefik_http: []
 #       - https://192.168.1.20:443
 #     skip_tls_verify: true
 #
+#   # Route HTTPS avec filtrage IP
+#   - name: prometheus
+#     rule: Host(`prometheus.example.com`)
+#     tls: true
+#     backends:
+#       - http://192.168.1.30:9090
+#     allowed_ips:
+#       - 82.x.x.x/32
+#       - 192.168.1.0/24
+#
 #   # Route HTTP sur port custom (crée l'entrypoint automatiquement)
 #   - name: jellyfin
 #     rule: PathPrefix(`/`)

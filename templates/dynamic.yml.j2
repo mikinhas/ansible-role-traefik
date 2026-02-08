@@ -7,13 +7,13 @@ http:
       rule: {{ route.rule }}
       service: {{ route.name }}
       entryPoints: [web]
-      middlewares: [https-redirect]
+      middlewares: [https-redirect{{ ', ' ~ route.name ~ '-ipallow' if route.allowed_ips is defined }}]
 
     {{ route.name }}:
       rule: {{ route.rule }}
       service: {{ route.name }}
       entryPoints: [websecure]
-      middlewares: [security-headers]
+      middlewares: [security-headers{{ ', ' ~ route.name ~ '-ipallow' if route.allowed_ips is defined }}]
 {% if traefik_acme_email %}
       tls:
         certResolver: letsencrypt
@@ -26,8 +26,12 @@ http:
       rule: {{ route.rule }}
       service: {{ route.name }}
       entryPoints: [{{ route.name if route.port is defined else 'web' }}]
-{% if route.host_header is defined %}
+{% if route.host_header is defined and route.allowed_ips is defined %}
+      middlewares: [{{ route.name }}-host, {{ route.name }}-ipallow]
+{% elif route.host_header is defined %}
       middlewares: [{{ route.name }}-host]
+{% elif route.allowed_ips is defined %}
+      middlewares: [{{ route.name }}-ipallow]
 {% endif %}
 
 {% endif %}
@@ -75,6 +79,15 @@ http:
       headers:
         customRequestHeaders:
           Host: {{ route.host_header }}
+
+{% endif %}
+{% if route.allowed_ips is defined %}
+    {{ route.name }}-ipallow:
+      ipAllowList:
+        sourceRange:
+{% for ip in route.allowed_ips %}
+          - {{ ip }}
+{% endfor %}
 
 {% endif %}
 {% endfor %}
