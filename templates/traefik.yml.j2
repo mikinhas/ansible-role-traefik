@@ -1,8 +1,10 @@
 entryPoints:
   web:
     address: ":80"
+{% if traefik_http | selectattr('tls', 'defined') | selectattr('tls') | list | length > 0 %}
   websecure:
     address: ":443"
+{% endif %}
 {% for route in traefik_http | default([]) %}
 {% if route.port is defined %}
   {{ route.name }}:

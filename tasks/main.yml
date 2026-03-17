@@ -86,7 +86,12 @@
     state: started
     restart_policy: unless-stopped
     networks: "{{ traefik_networks | default(omit) }}"
-    ports: "{{ ['80:80', '443:443'] + (_traefik_custom_ports | default([])) }}"
+    ports: >-
+      {{
+        ['80:80']
+        + (['443:443'] if traefik_http | default([]) | selectattr('tls', 'defined') | selectattr('tls') | list | length > 0 else [])
+        + (_traefik_custom_ports | default([]))
+      }}
     volumes: >-
       {{
         [
