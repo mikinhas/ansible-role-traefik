@@ -14,7 +14,7 @@ http:
       service: {{ route.name }}
       entryPoints: [websecure]
       middlewares: [security-headers{{ ', ' ~ route.name ~ '-ipallow' if route.allowed_ips is defined }}]
-{% if traefik_acme_email %}
+{% if traefik_acme_email | length > 0 %}
       tls:
         certResolver: letsencrypt
 {% else %}
@@ -120,7 +120,7 @@ tcp:
 {% endif %}
 
 tls:
-{% if traefik_tls_cert and traefik_tls_key %}
+{% if traefik_tls_cert | length > 0 and traefik_tls_key | length > 0 %}
   certificates:
     - certFile: /etc/traefik/certs/cert.pem
       keyFile: /etc/traefik/certs/key.pem

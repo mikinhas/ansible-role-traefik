@@ -21,7 +21,7 @@ providers:
     filename: /etc/traefik/dynamic.yml
     watch: true
 
-{% if traefik_acme_email %}
+{% if traefik_acme_email | length > 0 %}
 certificatesResolvers:
   letsencrypt:
     acme:
