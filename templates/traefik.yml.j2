@@ -1,0 +1,32 @@
+entryPoints:
+  web:
+    address: ":80"
+{% if traefik_http_to_https %}
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+{% endif %}
+  websecure:
+    address: ":443"
+
+{% if traefik_docker_provider %}
+providers:
+  docker:
+    exposedByDefault: false
+{% endif %}
+
+{% if traefik_acme_email | length > 0 %}
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: {{ traefik_acme_email }}
+      storage: /etc/traefik/acme/acme.json
+      caServer: {{ traefik_acme_server }}
+      httpChallenge:
+        entryPoint: web
+{% endif %}
+
+log:
+  level: INFO

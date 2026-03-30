@@ -1,0 +1,21 @@
+---
+traefik_version: "v3.6"
+traefik_container_name: traefik
+traefik_config_dir: /etc/traefik
+
+traefik_docker_provider: false
+
+traefik_http_to_https: true
+
+traefik_acme_email: ""
+traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory"
+
+traefik_env: {}
+# Example:
+# traefik_env:
+#   MY_VAR: "value"
+
+traefik_networks: []
+# Example:
+# traefik_networks:
+#   - name: mynetwork
